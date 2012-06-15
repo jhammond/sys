@@ -6,22 +6,20 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include "trace.h"
 
-static void usage(FILE *file, int status)
-{
-  fprintf(file, "Usage: %s [OPTION]... PATH\n",
-	  program_invocation_short_name);
-  exit(status);
-}
+const char *program_usage = "[OPTION]... PATH";
 
 int main(int argc, char *argv[])
 {
+  int at_fd = AT_FDCWD;
   const char *path;
   mode_t mode = 0777;
   int want_pause = 0;
   unsigned int delay = 0;
 
   struct option opts[] = {
+    { "at", 1, NULL, 'a' },
     { "help", 0, NULL, 'h' },
     { "mode", 1, NULL, 'm' },
     { "pause", 0, NULL, 'p' },
@@ -30,8 +28,11 @@ int main(int argc, char *argv[])
   };
 
   int c;
-  while ((c = getopt_long(argc, argv, "hm:ps:", opts, 0)) != -1) {
+  while ((c = getopt_long(argc, argv, "a:hm:ps:", opts, 0)) != -1) {
     switch (c) {
+    case 'a':
+      at_fd = atoi(optarg);
+      break;
     case 'h':
       usage(stdout, EXIT_SUCCESS);
       break;
@@ -56,10 +57,8 @@ int main(int argc, char *argv[])
 
   path = argv[optind];
 
-  if (mkdir(path, mode) < 0) {
-    fprintf(stderr, "cannot mkdir `%s' with mode %04o: %m\n", path, mode);
-    exit(EXIT_FAILURE);
-  }
+  if (mkdirat(at_fd, path, mode) < 0)
+    FATAL("cannot mkdir `%s' with mode %04o: %m\n", path, mode);
 
   if (want_pause)
     pause();
