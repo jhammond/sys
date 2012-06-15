@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 	break;
       }
 
-      printf("%10"PRIu64" %10"PRId64" %4hu %c `%s'\n",
+      printf("%18"PRIu64" %20"PRId64" %4hu %c `%s'\n",
 	     d->d_ino, (int64_t) d->d_off, d->d_reclen, d_type, d->d_name);
 
       p += d->d_reclen;
