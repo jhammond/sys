@@ -13,6 +13,7 @@ SYS_CMDS = \
   sys_mkdirat \
   sys_mknod \
   sys_open \
+  sys_path2fid \
   sys_readlink \
   sys_rename \
   sys_rmdir \
