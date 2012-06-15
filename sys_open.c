@@ -9,7 +9,15 @@
 
 static void usage(FILE *file, int status)
 {
-  fprintf(file, "Usage: %s [OPTION]... PATH FLAGS\n",
+  fprintf(file, "Usage: %s [OPTION]... PATH FLAGS\n"
+          "Open file.\n"
+          "\n"
+          "Mandatory arguments to long options are mandatory for short options too.\n"
+          "  -h, --help\n"
+          "  -m, --mode=MODE\n"
+          "  -p, --pause\n"
+          "  -s, --sleep=SECONDS\n"
+          ,
 	  program_invocation_short_name);
   exit(status);
 }
