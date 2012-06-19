@@ -31,7 +31,7 @@ struct lu_fid {
 
 static void usage(FILE *file, int status)
 {
-  fprintf(file, "Usage: %s [OPTION]... PATH FLAGS\n"
+  fprintf(file, "Usage: %s [OPTION]... PATH [FLAGS]\n"
           "Open file and call LL_IOC_PATH2FID.\n"
           "FLAGS: acdDerstw\n"
           "\n"
@@ -54,6 +54,7 @@ int main(int argc, char *argv[])
   int flags = 0, o_read = 0, o_write = 0;
   int fd;
   struct lu_fid fid;
+  char *s;
 
   struct option opts[] = {
     { "help", 0, NULL, 'h' },
@@ -85,12 +86,17 @@ int main(int argc, char *argv[])
     }
   }
 
-  if (argc - optind < 2)
+  if (argc - optind < 1)
     usage(stderr, EXIT_FAILURE);
 
   path = argv[optind];
 
-  char *s = argv[optind + 1];
+  if (argc - optind == 1) {
+    o_read = 1;
+    goto have_flags;
+  }
+
+  s = argv[optind + 1];
   for (; *s != 0; s++) {
     switch(*s) {
     case 'a':
@@ -132,6 +138,7 @@ int main(int argc, char *argv[])
   if (!o_read && o_write)
     flags |= O_WRONLY;
 
+ have_flags:
   fd = open(path, flags, mode);
   if (fd < 0) {
     fprintf(stderr, "cannot open `%s' with flags %d, mode %04o: %m\n",
@@ -144,7 +151,7 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  printf("[%#"PRIx64":%#"PRIx32":%#"PRIx32"]\n",
+  printf("[0x%"PRIx64":0x%"PRIx32":0x%"PRIx32"]\n",
          fid.f_seq, fid.f_oid, fid.f_ver);
 
   if (want_pause)
