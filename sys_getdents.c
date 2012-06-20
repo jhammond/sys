@@ -19,23 +19,28 @@ int main(int argc, char *argv[])
   struct option opts[] = {
     { "help", 0, NULL, 'h' },
     { "raw",  0, NULL, 'r' },
+    { "verbose", 0, NULL, 'v' },
     { "hex",  0, NULL, 'x' },
     { NULL }
   };
-  int want_hex = 0;
-  int want_raw = 0;
+  int show_hex = 0;
+  int show_raw = 0;
+  int verbose = 0;
 
   int c;
-  while ((c = getopt_long(argc, argv, "hrx", opts, 0)) != -1) {
+  while ((c = getopt_long(argc, argv, "hrvx", opts, 0)) != -1) {
     switch (c) {
     case 'h':
       usage(stdout, EXIT_SUCCESS);
       break;
     case 'r':
-      want_raw = 1;
+      show_raw = 1;
       break;
     case 'x':
-      want_hex = 1;
+      show_hex = 1;
+      break;
+    case 'v':
+      verbose = 1;
       break;
     case '?':
       bad_option();
@@ -62,7 +67,7 @@ int main(int argc, char *argv[])
     if (nr == 0)
       break;
 
-    if (want_raw) {
+    if (show_raw) {
       write(STDOUT_FILENO, buf, nr);
       continue;
     }
@@ -115,14 +120,21 @@ int main(int argc, char *argv[])
 	break;
       }
 
-      if (want_hex)
-	printf("%16"PRIx64" %16"PRIx64" %4hx %2d-%c `%s'\n",
-	       d->d_ino, (uint64_t) d->d_off, (unsigned short) d->d_reclen,
-	       (int) d->d_type, d_type_c, d->d_name);
-      else
-	printf("%18"PRIu64" %20"PRId64" %4hu %2x-%c `%s'\n",
-	       d->d_ino, (int64_t) d->d_off, d->d_reclen,
-	       (unsigned) d->d_type, d_type_c, d->d_name);
+      if (verbose) { /* Show d_off, d_reclen, d_type. */
+	if (show_hex)
+	  printf("%2x-%c %16"PRIx64" %16"PRIx64" %4hx `%s'\n",
+		 (unsigned) d->d_type, d_type_c, d->d_ino,
+		 (uint64_t) d->d_off, (unsigned short) d->d_reclen, d->d_name);
+	else
+	  printf("%3u-%c %18"PRIu64" %20"PRId64" %4hu `%s'\n",
+		 (unsigned) d->d_type, d_type_c, d->d_ino,
+		 (uint64_t) d->d_off, (unsigned short) d->d_reclen, d->d_name);
+      } else {
+	if (show_hex)
+	  printf("%c %16"PRIx64" `%s'\n", d_type_c, d->d_ino, d->d_name);
+	else
+	  printf("%c %16"PRIu64" `%s'\n", d_type_c, d->d_ino, d->d_name);
+      }
 
       p += d->d_reclen;
     }
