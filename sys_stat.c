@@ -1,28 +1,25 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <getopt.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include "trace.h"
 
-int main(int argc, char *argv[])
+const char *program_usage = "[OPTION]... PATH...";
+int want_hex = 0;
+int want_raw = 0;
+
+int sys_stat(const char *path)
 {
-  const char *path;
-  struct stat st = { };
-
-  if (argc < 2) {
-    fprintf(stderr, "Usage: %s PATH\n",
-	    program_invocation_short_name);
-    exit(EXIT_FAILURE);
-  }
-
-  path = argv[1];
+  struct stat st;
 
   if (stat(path, &st) < 0) {
     fprintf(stderr, "cannot stat `%s': %s\n", path, strerror(errno));
-    exit(EXIT_FAILURE);
+    return -1;
   }
 
   /*
@@ -34,6 +31,11 @@ int main(int argc, char *argv[])
    * blksize_t, pid_t, and ssize_t shall be signed integer types.
    * time_t and clock_t shall be integer or real-floating types.
    */
+
+  if (want_raw) {
+    write(STDOUT_FILENO, &st, sizeof(st)); /* XXX */
+    return 0;
+  }
 
 #define STAT_X \
   X(lu, dev_t,     dev,     "ID of device containing file"), \
@@ -55,10 +57,55 @@ int main(int argc, char *argv[])
   typedef long sys_ld_t;
   typedef int sys_d_t;
 
+  if (want_hex) {
 #define X(pri,type,mem,desc) \
-  printf("%-8s %16"#pri"\n", #mem, (sys_##pri##_t) st.st_##mem)
-  STAT_X;
+    printf("%-8s %16lx\n", #mem, (unsigned long) st.st_##mem)
+    STAT_X;
 #undef X
+  } else {
+#define X(pri,type,mem,desc) \
+    printf("%-8s %16"#pri"\n", #mem, (sys_##pri##_t) st.st_##mem)
+    STAT_X;
+#undef X
+  }
 
   return 0;
+}
+
+int main(int argc, char *argv[])
+{
+  struct option opts[] = {
+    { "help", 0, NULL, 'h' },
+    { "raw",  0, NULL, 'r' },
+    { "hex",  0, NULL, 'x' },
+    { NULL }
+  };
+
+  int c;
+  while ((c = getopt_long(argc, argv, "hrx", opts, 0)) != -1) {
+    switch (c) {
+    case 'h':
+      usage(stdout, EXIT_SUCCESS);
+      break;
+    case 'r':
+      want_raw = 1;
+      break;
+    case 'x':
+      want_hex = 1;
+      break;
+    case '?':
+      bad_option();
+      break;
+    }
+  }
+
+  if (argc - optind < 1)
+    usage(stderr, EXIT_FAILURE);
+
+  int i;
+  for (i = optind; i < argc; i++)
+    if (sys_stat(argv[i]) < 0)
+      return EXIT_FAILURE;
+
+  return EXIT_SUCCESS;
 }
