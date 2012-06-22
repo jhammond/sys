@@ -14,6 +14,32 @@
 
 const char *program_usage = "[OPTION]... PATH";
 
+static inline int d_type_c(struct dirent64 *d)
+{
+  switch (d->d_type) {
+  default:
+    return '!';
+  case DT_UNKNOWN:
+    return '?';
+  case DT_FIFO:
+    return 'p';
+  case DT_CHR:
+    return 'c';
+  case DT_DIR:
+    return 'd';
+  case DT_BLK:
+    return 'b';
+  case DT_REG:
+    return 'r';
+  case DT_LNK:
+    return 'l';
+  case DT_SOCK:
+    return 's';
+  case DT_WHT:
+    return 'w';
+  }
+}
+
 int main(int argc, char *argv[])
 {
   struct option opts[] = {
@@ -26,6 +52,7 @@ int main(int argc, char *argv[])
   int show_hex = 0;
   int show_raw = 0;
   int verbose = 0;
+  /* int show_esc = 0; TODO */
 
   int c;
   while ((c = getopt_long(argc, argv, "hrvx", opts, 0)) != -1) {
@@ -59,7 +86,7 @@ int main(int argc, char *argv[])
 
   while (1) {
     char buf[4096];
-    int nr = syscall(SYS_getdents64, dfd, buf, sizeof(buf));
+    ssize_t nr = syscall(SYS_getdents64, dfd, buf, sizeof(buf));
 
     if (nr < 0)
       FATAL("cannot read directory `%s': %s\n", path, strerror(errno));
@@ -85,55 +112,22 @@ int main(int argc, char *argv[])
     char *p = buf;
     while (p < buf + nr) {
       struct dirent64 *d = (struct dirent64 *) p;
-      int d_type_c;
-
-      switch (d->d_type) {
-      default:
-	d_type_c = '!';
-	break;
-      case DT_UNKNOWN:
-	d_type_c = '?';
-	break;
-      case DT_FIFO:
-	d_type_c = 'p';
-	break;
-      case DT_CHR:
-	d_type_c = 'c';
-	break;
-      case DT_DIR:
-	d_type_c = 'd';
-	break;
-      case DT_BLK:
-	d_type_c = 'b';
-	break;
-      case DT_REG:
-	d_type_c = 'r';
-	break;
-      case DT_LNK:
-	d_type_c = 'l';
-	break;
-      case DT_SOCK:
-	d_type_c = 's';
-	break;
-      case DT_WHT:
-	d_type_c = 'w';
-	break;
-      }
+      int c = d_type_c(d);
 
       if (verbose) { /* Show d_off, d_reclen, d_type. */
 	if (show_hex)
 	  printf("%2x-%c %16"PRIx64" %16"PRIx64" %4hx `%s'\n",
-		 (unsigned) d->d_type, d_type_c, d->d_ino,
+		 (unsigned) d->d_type, c, d->d_ino,
 		 (uint64_t) d->d_off, (unsigned short) d->d_reclen, d->d_name);
 	else
 	  printf("%3u-%c %18"PRIu64" %20"PRId64" %4hu `%s'\n",
-		 (unsigned) d->d_type, d_type_c, d->d_ino,
+		 (unsigned) d->d_type, c, d->d_ino,
 		 (uint64_t) d->d_off, (unsigned short) d->d_reclen, d->d_name);
       } else {
 	if (show_hex)
-	  printf("%c %16"PRIx64" `%s'\n", d_type_c, d->d_ino, d->d_name);
+	  printf("%c %16"PRIx64" `%s'\n", c, d->d_ino, d->d_name);
 	else
-	  printf("%c %16"PRIu64" `%s'\n", d_type_c, d->d_ino, d->d_name);
+	  printf("%c %16"PRIu64" `%s'\n", c, d->d_ino, d->d_name);
       }
 
       p += d->d_reclen;
