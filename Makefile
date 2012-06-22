@@ -8,6 +8,7 @@ SYS_CMDS = \
   sys_creat \
   sys_getdents \
   sys_link \
+  sys_listxattr \
   sys_lstat \
   sys_mkdir \
   sys_mkdirat \
