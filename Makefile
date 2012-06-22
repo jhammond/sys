@@ -7,6 +7,7 @@ SYS_CMDS = \
   sys_chown \
   sys_creat \
   sys_getdents \
+  sys_lea \
   sys_link \
   sys_listxattr \
   sys_lma \

@@ -12,6 +12,9 @@
 
 #define LL_IOC_PATH2FID _IOR ('f', 173, long)
 
+typedef uint32_t __u32;
+typedef uint64_t __u64;
+
 struct lu_fid {
   /**                                                                                           
    * FID sequence. Sequence is a unit of migration: all files (objects)                         
@@ -32,6 +35,27 @@ struct lu_fid {
 
 #define PRI_FID "[0x%"PRIx64":0x%"PRIx32":0x%"PRIx32"]"
 #define PRI_FID_ARGS(f) (f)->f_seq, (f)->f_oid, (f)->f_ver
+
+
+/* The link ea holds 1 \a link_ea_entry for each hardlink */
+#define LINK_EA_MAGIC 0x11EAF1DFUL
+
+struct link_ea_header {
+  __u32 leh_magic;
+  __u32 leh_reccount;
+  __u64 leh_len; /* total size */
+  __u32 padding1; /* future use */
+  __u32 padding2; /* future use */
+};
+
+/* Hardlink data is name and parent fid.  Stored in this crazy struct
+ * for maximum packing and endian-neutrality. */
+struct link_ea_entry {
+  /* __u16 stored big-endian, unaligned */
+  unsigned char      lee_reclen[2];
+  unsigned char      lee_parent_fid[sizeof(struct lu_fid)];
+  char               lee_name[0];
+} __attribute__((packed));
 
 struct lustre_mdt_attrs {
   /*
