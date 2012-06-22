@@ -8,26 +8,7 @@
 #include <sys/stat.h>
 #include <sys/ioctl.h>
 #include <inttypes.h>
-
-struct lu_fid {
-  /**
-   * FID sequence. Sequence is a unit of migration: all files (objects)
-   * with FIDs from a given sequence are stored on the same server.
-   * Lustre should support 2^64 objects, so even if each sequence
-   * has only a single object we can still enumerate 2^64 objects.
-   */
-  uint64_t f_seq;
-  /** FID number within sequence. */
-  uint32_t f_oid;
-  /**
-   * FID version, used to distinguish different versions (in the sense
-   * of snapshots, etc.) of the same file system object. Not currently
-   * used.
-   */
-  uint32_t f_ver;
-};
-
-#define LL_IOC_PATH2FID _IOR ('f', 173, long )
+#include "sys_lustre.h"
 
 static void usage(FILE *file, int status)
 {
@@ -151,8 +132,7 @@ int main(int argc, char *argv[])
     exit(EXIT_FAILURE);
   }
 
-  printf("[0x%"PRIx64":0x%"PRIx32":0x%"PRIx32"]\n",
-         fid.f_seq, fid.f_oid, fid.f_ver);
+  printf(PRI_FID"\n", PRI_FID_ARGS(&fid));
 
   if (want_pause)
     pause();
