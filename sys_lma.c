@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
       break;
 
     if (errno != ERANGE)
-      FATAL("cannot retreive value for attribute `%s' of `%s': %s\n",
+      FATAL("cannot retrieve value for attribute `%s' of `%s': %s\n",
 	    attr_name, path, strerror(errno));
     val_buf_size *= 2;
   }

@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
       break;
 
     if (errno != ERANGE)
-      FATAL("cannot retreive extended attribute list for `%s': %s\n",
+      FATAL("cannot retrieve extended attribute list for `%s': %s\n",
 	    path, strerror(errno));
 
     list_buf_size *= 2;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
         break;
 
       if (errno != ERANGE) {
-        ERROR("cannot retreive value for attribute `%s' of `%s': %s\n",
+        ERROR("cannot retrieve value for attribute `%s' of `%s': %s\n",
 	      attr_name, path, strerror(errno));
 	goto next_attr;
       }
