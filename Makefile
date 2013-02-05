@@ -1,4 +1,8 @@
-CFLAGS = -Wall -Werror -D_GNU_SOURCE
+CPPFLAGS += -D_GNU_SOURCE \
+            -I/root/lustre-release/lustre/include \
+            -I/root/lustre-release/libcfs/include
+
+CFLAGS += -Wall -Werror
 
 SYS_CMDS = \
   sys_access \
@@ -7,6 +11,7 @@ SYS_CMDS = \
   sys_chown \
   sys_creat \
   sys_getdents \
+  sys_getstripe \
   sys_lea \
   sys_link \
   sys_listxattr \
@@ -16,10 +21,12 @@ SYS_CMDS = \
   sys_mkdirat \
   sys_mknod \
   sys_open \
+  sys_open_delay_create \
   sys_path2fid \
   sys_readlink \
   sys_rename \
   sys_rmdir \
+  sys_setstripe \
   sys_stat \
   sys_symlink \
   sys_truncate \
