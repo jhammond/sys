@@ -104,10 +104,12 @@ int main(int argc, char *argv[])
   X(32, lma_self_fid.f_oid);
   X(32, lma_self_fid.f_ver);
   X(64, lma_flags);
+#if 0
   X(64, lma_ioepoch); /* IO epoch to which SOM attributes belong. */
   X(64, lma_som_size); /* Total file size in objects. */
   X(64, lma_som_blocks); /* Total fs blocks in objects. */
   X(64, lma_som_mountid); /* MDS mount id for which the size is valid. */
+#endif
 #undef X
 
   free(val_buf);

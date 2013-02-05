@@ -18,6 +18,7 @@ static inline int d_type_c(struct dirent64 *d)
 {
   switch (d->d_type) {
   default:
+	  fprintf(stderr, "dirent '%s' has unknown d_type %d\n", d->d_name, d->d_type);
     return '!';
   case DT_UNKNOWN:
     return '?';

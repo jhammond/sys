@@ -73,6 +73,7 @@ struct lustre_mdt_attrs {
   struct lu_fid lma_self_fid;
   /** mdt/ost type, others */
   uint64_t lma_flags;
+#if 0
   /* IO Epoch SOM attributes belongs to */
   uint64_t lma_ioepoch;
   /** total file size in objects */
@@ -81,6 +82,7 @@ struct lustre_mdt_attrs {
   uint64_t lma_som_blocks;
   /** mds mount id the size is valid for */
   uint64_t lma_som_mountid;
+#endif
 };
 
 #endif
