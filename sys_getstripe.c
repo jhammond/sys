@@ -30,12 +30,12 @@ int main(int argc, char *argv[])
 	const char *path = argv[1];
 	int fd = -1;
 
-	struct lov_user_md_v1 *lum;
+	struct lov_user_md_v3 *lum;
 	size_t stripe_count = 1024;
  	size_t lum_size = sizeof(*lum) +
 		stripe_count * sizeof(lum->lmm_objects[0]);
 
-	fd = open(path, O_RDWR|O_CREAT|O_LOV_DELAY_CREATE, 0666);
+	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		FATAL("cannot open '%s': %m\n", path);
 
@@ -44,20 +44,24 @@ int main(int argc, char *argv[])
 		FATAL("cannot allocate stripe info: %m\n");
 	memset(lum, 0, lum_size);
 
-	lum->lmm_magic = LOV_USER_MAGIC_V1;
+	lum->lmm_magic = LOV_USER_MAGIC_V3;
 	lum->lmm_stripe_count = stripe_count;
 
 	int rc = ioctl(fd, LL_IOC_LOV_GETSTRIPE, lum);
 	if (rc < 0)
 		FATAL("cannot get stripe info for `%s': %m\n", path);
 
-	printf("lmm_magic         %8x\n"
-	       "lmm_pattern       %8x\n"
-	       "lmm_object_id     %8lx\n"
-	       "lmm_object_seq    %8lx\n"
-	       "lmm_stripe_size   %8x\n"
-	       "lmm_stripe_count  %8x\n"
-	       "lmm_stripe_offset %8x\n",
+	if (lum->lmm_magic != LOV_USER_MAGIC_V3)
+		FATAL("'%s' unexpected stripe md magic %x, expected %x\n",
+		      path, lum->lmm_magic, LOV_USER_MAGIC_V3);
+
+	printf("lmm_magic         %12x\n"
+	       "lmm_pattern       %12x\n"
+	       "lmm_object_id     %12lx\n"
+	       "lmm_object_seq    %12lx\n"
+	       "lmm_stripe_size   %12x\n"
+	       "lmm_stripe_count  %12x\n"
+	       "lmm_stripe_offset %12x\n",
 	       lum->lmm_magic,
 	       lum->lmm_pattern,
 	       (unsigned long) lum->lmm_object_id,
