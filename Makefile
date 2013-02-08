@@ -5,6 +5,7 @@ CPPFLAGS += -D_GNU_SOURCE \
 CFLAGS += -Wall -Werror
 
 SYS_CMDS = \
+  sys_2523 \
   sys_access \
   sys_chdir \
   sys_chmod \
@@ -20,6 +21,7 @@ SYS_CMDS = \
   sys_mkdir \
   sys_mkdirat \
   sys_mknod \
+  sys_o_delay_race \
   sys_open \
   sys_open_delay_create \
   sys_path2fid \

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <inttypes.h>
+#include <getopt.h>
 #include <malloc.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -9,33 +9,48 @@
 #include <sys/ioctl.h>
 #include <errno.h>
 #include "lustre/lustre_user.h"
+#include "trace.h"
 
-#ifdef DEBUG
-#define TRACE ERROR
-#else
-static inline void TRACE(char *fmt, ...) { }
-#endif
-
-#define ERROR(fmt,args...) \
-	fprintf(stderr, "%s: "fmt, program_invocation_short_name, ##args)
-
-#define FATAL(fmt,args...)			\
-	do {					\
-		ERROR(fmt, ##args);		\
-		exit(1);			\
-	} while (0)
+const char *program_usage = "[OPTION]... PATH";
 
 int main(int argc, char *argv[])
 {
 	const char *path = NULL;
 	int fd = -1;
-
 	struct lov_user_md_v3 *lum = NULL;
 	size_t stripe_count = 2;
 	size_t lum_size;
+	int want_quiet = 0;
 
-	path = argv[1];
-	/* TODO usage, count. */
+	struct option opts[] = {
+		{ "count", 1, NULL, 'c' },
+		{ "help",  0, NULL, 'h' },
+		{ "quiet", 0, NULL, 'q' },
+		{ NULL }
+	};
+
+	int c;
+	while ((c = getopt_long(argc, argv, "c:hq", opts, 0)) != -1) {
+		switch (c) {
+		case 'c':
+			stripe_count = strtoul(optarg, NULL, 0);
+			break;
+		case 'h':
+			usage(stdout, EXIT_SUCCESS);
+			break;
+		case 'q':
+			want_quiet = 1;
+			break;
+		case '?':
+			bad_option();
+			break;
+		}
+	}
+
+	if (argc - optind < 1)
+		usage(stderr, EXIT_FAILURE);
+
+	path = argv[optind];
 
 	fd = open(path, O_RDWR|O_CREAT|O_LOV_DELAY_CREATE, 0666);
 	if (fd < 0)
@@ -57,11 +72,13 @@ int main(int argc, char *argv[])
 	if (rc < 0)
 		FATAL("cannot set stripe info for '%s': %m\n", path);
 
+	if (want_quiet)
+		goto out;
+
 	if (lum->lmm_magic != LOV_USER_MAGIC_V3)
 		FATAL("'%s' unexpected stripe md magic %x, expected %x\n",
 		      path, lum->lmm_magic, LOV_USER_MAGIC_V3);
 
-	/* TODO Not returned. */
 	printf("lmm_magic         %12x\n"
 	       "lmm_pattern       %12x\n"
 	       "lmm_object_id     %12lx\n"
@@ -77,6 +94,7 @@ int main(int argc, char *argv[])
 	       (unsigned) lum->lmm_stripe_count,
 	       (unsigned) lum->lmm_stripe_offset);
 
+	/* TODO Not returned. */
 	printf("%12s %12s %8s %8s\n",
 	       "object_id", "object_seq", "ost_gen", "ost_idx");
 
@@ -92,7 +110,10 @@ int main(int argc, char *argv[])
 		       o->l_ost_idx);
 	}
 
-	close(fd);
+out:
+	if (close(fd) < 0)
+		FATAL("error closing '%s': %s\n",
+		      path, strerror(errno));
 
 	return 0;
 }
