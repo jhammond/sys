@@ -72,12 +72,12 @@ int main(int argc, char *argv[])
 	if (rc < 0)
 		FATAL("cannot set stripe info for '%s': %m\n", path);
 
-	if (want_quiet)
-		goto out;
-
 	if (lum->lmm_magic != LOV_USER_MAGIC_V3)
 		FATAL("'%s' unexpected stripe md magic %x, expected %x\n",
 		      path, lum->lmm_magic, LOV_USER_MAGIC_V3);
+
+	if (want_quiet)
+		goto out;
 
 	printf("lmm_magic         %12x\n"
 	       "lmm_pattern       %12x\n"
@@ -93,22 +93,6 @@ int main(int argc, char *argv[])
 	       lum->lmm_stripe_size,
 	       (unsigned) lum->lmm_stripe_count,
 	       (unsigned) lum->lmm_stripe_offset);
-
-	/* TODO Not returned. */
-	printf("%12s %12s %8s %8s\n",
-	       "object_id", "object_seq", "ost_gen", "ost_idx");
-
-	int i;
-	for (i = 0; i < lum->lmm_stripe_count; i++) {
-		struct lov_user_ost_data_v1 *o;
-
-		o = &lum->lmm_objects[i];
-		printf("%12llx %12llx %8x %8x\n",
-		       o->l_object_id,
-		       o->l_object_seq,
-		       o->l_ost_gen,
-		       o->l_ost_idx);
-	}
 
 out:
 	if (close(fd) < 0)
