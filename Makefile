@@ -26,6 +26,7 @@ SYS_CMDS = \
   sys_open_delay_create \
   sys_path2fid \
   sys_readlink \
+  sys_remove_entry \
   sys_rename \
   sys_rmdir \
   sys_setstripe \
