@@ -12,6 +12,7 @@ SYS_CMDS = \
   sys_chown \
   sys_creat \
   sys_getdents \
+  sys_getdents_race \
   sys_getstripe \
   sys_lea \
   sys_link \
@@ -27,6 +28,7 @@ SYS_CMDS = \
   sys_path2fid \
   sys_readlink \
   sys_rename \
+  sys_rename_race \
   sys_rmdir \
   sys_setstripe \
   sys_stat \
