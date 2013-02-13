@@ -35,7 +35,11 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	unlink(path2);
+	if (unlink(path2) < 0 && errno != ENOENT) {
+		fprintf(stderr, "cannot unlink '%s': %s\n",
+			path2, strerror(errno));
+		exit(1);
+	}
 
 	int fd2 = open(path2, O_RDWR|O_CREAT|O_LOV_DELAY_CREATE, 0666);
 	if (fd2 < 0) {
@@ -50,8 +54,17 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	ioctl(fd2, LL_IOC_LOV_SETSTRIPE, lum);
-	/* Unreached. */
+	if (ioctl(fd2, LL_IOC_LOV_SETSTRIPE, lum) < 0)
+		fprintf(stderr, "cannot set striping on '%s': %s\n",
+			path2, strerror(errno));
+
+	if (close(fd1) < 0)
+		fprintf(stderr, "error closing '%s': %s\n",
+			path1, strerror(errno));
+
+	if (close(fd2) < 0)
+		fprintf(stderr, "error closing '%s': %s\n",
+			path2, strerror(errno));
 
 	return 0;
 }
