@@ -117,13 +117,15 @@ int main(int argc, char *argv[])
 
       if (verbose) { /* Show d_off, d_reclen, d_type. */
 	if (show_hex)
-	  printf("%2x-%c %16"PRIx64" %16"PRIx64" %4hx `%s'\n",
+	  printf("d_type = %2x (%c), d_ino = %16"PRIx64", d_off = %16"PRIx64", "
+		 "d_reclen = %4hx, d_name = '%s'\n",
 		 (unsigned) d->d_type, c, d->d_ino,
 		 (uint64_t) d->d_off, (unsigned short) d->d_reclen, d->d_name);
 	else
-	  printf("%3u-%c %18"PRIu64" %20"PRId64" %4hu `%s'\n",
+	  printf("d_type = %3u (%c), d_ino = %18"PRIu64", d_off = %20"PRId64", "
+		 "d_reclen = %4hu, d_name = '%s'\n",
 		 (unsigned) d->d_type, c, d->d_ino,
-		 (uint64_t) d->d_off, (unsigned short) d->d_reclen, d->d_name);
+		 d->d_off, (unsigned short) d->d_reclen, d->d_name);
       } else {
 	if (show_hex)
 	  printf("%c %16"PRIx64" `%s'\n", c, d->d_ino, d->d_name);

@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 	const char *path = argv[1];
 	int fd = -1;
 
-	struct lov_user_md_v3 *lum;
+	struct lov_user_md_v1 *lum;
 	size_t stripe_count = 1024;
  	size_t lum_size = sizeof(*lum) +
 		stripe_count * sizeof(lum->lmm_objects[0]);
@@ -44,16 +44,20 @@ int main(int argc, char *argv[])
 		FATAL("cannot allocate stripe info: %m\n");
 	memset(lum, 0, lum_size);
 
-	lum->lmm_magic = LOV_USER_MAGIC_V3;
+	lum->lmm_magic = LOV_USER_MAGIC_V1;
 	lum->lmm_stripe_count = stripe_count;
+
+	memset(&lum->lmm_objects[0], 0xff,
+	       stripe_count * sizeof(lum->lmm_objects[0]));
 
 	int rc = ioctl(fd, LL_IOC_LOV_GETSTRIPE, lum);
 	if (rc < 0)
 		FATAL("cannot get stripe info for `%s': %m\n", path);
 
-	if (lum->lmm_magic != LOV_USER_MAGIC_V3)
+	if (lum->lmm_magic != LOV_USER_MAGIC_V1 &&
+	    lum->lmm_magic != LOV_USER_MAGIC_V3)
 		FATAL("'%s' unexpected stripe md magic %x, expected %x\n",
-		      path, lum->lmm_magic, LOV_USER_MAGIC_V3);
+		      path, lum->lmm_magic, LOV_USER_MAGIC_V1);
 
 	printf("lmm_magic         %12x\n"
 	       "lmm_pattern       %12x\n"
@@ -73,9 +77,15 @@ int main(int argc, char *argv[])
 	printf("%12s %12s %8s %8s\n",
 	       "object_id", "object_seq", "ost_gen", "ost_idx");
 
+	struct lov_user_ost_data_v1 *objs;
+	if (lum->lmm_magic == LOV_USER_MAGIC_V1)
+		objs = &((struct lov_user_md_v1 *) lum)->lmm_objects[0];
+	else
+		objs = &((struct lov_user_md_v3 *) lum)->lmm_objects[0];
+
 	int i;
 	for (i = 0; i < lum->lmm_stripe_count; i++) {
-		struct lov_user_ost_data_v1 *o = &lum->lmm_objects[i];
+		struct lov_user_ost_data_v1 *o = &objs[i];
 		printf("%12lx %12lx %8x %8x\n",
 		       (unsigned long) o->l_object_id,
 		       (unsigned long) o->l_object_seq,
