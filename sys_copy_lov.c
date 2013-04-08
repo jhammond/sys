@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	int fd[2], i, rc = 0;
 
 	const char *lov_xattr_name = "trusted.lov";
-	unsigned char lov_xattr_buf[80];
+	unsigned char lov_xattr_buf[65536];
 
 	for (i = 0; i < 2; i++) {
 		int flags = (i == 0) ? O_RDONLY
