@@ -44,12 +44,7 @@ int main(int argc, char *argv[])
 	int i, n = 2;
 
 	for (i = 0; i < n; i++) {
-		if (i == 0)
-			fd[i] = 9;
-		else
-			fd[i] = open(path[i], O_WRONLY,
-				     /* i == 0 ? O_RDWR|O_CREAT : O_RDONLY, */
-				     0666);
+		fd[i] = open(path[i], O_WRONLY|O_LOV_DELAY_CREATE, 0666);
 		if (fd[i] < 0)
 			FATAL("cannot open '%s': %m\n", path[i]);
 	}
