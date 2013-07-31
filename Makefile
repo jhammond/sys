@@ -1,6 +1,9 @@
+LUSTRE_RELEASE=/root/lustre-release
 CPPFLAGS += -D_GNU_SOURCE \
-            -I/root/lustre-release/lustre/include \
-            -I/root/lustre-release/libcfs/include
+            -include ${LUSTRE_RELEASE}/config.h \
+            -I${LUSTRE_RELEASE}/libcfs/include \
+            -I${LUSTRE_RELEASE}/lnet/include \
+            -I${LUSTRE_RELEASE}/lustre/include
 
 CFLAGS += -Wall -Werror
 
