@@ -9,23 +9,21 @@
 #include <sys/ioctl.h>
 #include <sys/xattr.h>
 #include <errno.h>
-#include "lustre/lustre_user.h"
+#include "sys_lustre.h"
 #include "trace.h"
 
 int main(int argc, char *argv[])
 {
 	const char *path = argv[1];
-	int fd = -1;
+	/* int fd = -1; */
 
         const char *lov_xattr_name = "trusted.lov";
         void *lov_xattr_buf;
 	size_t lov_xattr_buf_size;
 	ssize_t lov_xattr_size;
-	size_t max_stripe_count = 1024;
-	const struct lov_user_md_v1 *lum;
+	const struct lov_user_md *lum;
 
- 	lov_xattr_buf_size = offsetof(struct lov_user_md_v3,
-				      lmm_objects[max_stripe_count]);
+ 	lov_xattr_buf_size = XATTR_SIZE_MAX;
 
 	lov_xattr_buf = malloc(lov_xattr_buf_size);
 	if (lov_xattr_buf == NULL)
@@ -33,12 +31,14 @@ int main(int argc, char *argv[])
 
 	memset(lov_xattr_buf, 0xff, lov_xattr_buf_size);
 
+#if 0
 	fd = open(path, O_RDONLY);
 	if (fd < 0)
 		FATAL("cannot open '%s': %m\n", path);
+#endif
 
-	lov_xattr_size = fgetxattr(fd, lov_xattr_name, lov_xattr_buf,
-				   lov_xattr_buf_size);
+	lov_xattr_size = getxattr(path, lov_xattr_name, lov_xattr_buf,
+				  lov_xattr_buf_size);
         if (lov_xattr_size < 0)
                 FATAL("cannot get xattr '%s' of '%s': %s\n",
                       lov_xattr_name, path, strerror(errno));
@@ -54,6 +54,9 @@ int main(int argc, char *argv[])
 	    lum->lmm_magic != LOV_USER_MAGIC_V3)
 		FATAL("'%s' unexpected stripe md magic %x, expected %x\n",
 		      path, lum->lmm_magic, LOV_USER_MAGIC_V1);
+
+	fprint_lov_user_md(stdout, lum, lov_xattr_size);
+#if 0
 
 	printf("lmm_magic         %12x\n"
 	       "lmm_pattern       %12x\n"
@@ -100,6 +103,7 @@ int main(int argc, char *argv[])
 	}
 
 	close(fd);
+#endif
 
 	return 0;
 }

@@ -1,8 +1,12 @@
 #ifndef _SYS_LUSTRE_H_
 #define _SYS_LUSTRE_H_
+#include <stddef.h>
+#include <stdio.h>
+#include <errno.h>
 #include <inttypes.h>
 #include <sys/ioctl.h>
 #include "lustre/lustre_user.h"
+#include "lustre/lustre_idl.h"
 
 #define XATTR_NAME_LOV     "trusted.lov"
 #define XATTR_NAME_LMA     "trusted.lma"
@@ -21,6 +25,7 @@
 /* The link ea holds 1 \a link_ea_entry for each hardlink */
 #define LINK_EA_MAGIC 0x11EAF1DFUL
 
+#if 0
 struct link_ea_header {
 	uint32_t leh_magic;
 	uint32_t leh_reccount;
@@ -37,23 +42,95 @@ struct link_ea_entry {
 	unsigned char	lee_parent_fid[sizeof(struct lu_fid)];
 	char		lee_name[0];
 } __attribute__((packed));
+#endif
 
-struct lustre_mdt_attrs {
-	/*
-	 * Bitfield for supported data in this structure. From enum
-	 * lma_compat.  lma_self_fid and lma_flags are always available.
-	 */
-	uint32_t	lma_compat;
-	/*
-	 * Per-file incompat feature list. Lustre version should support all
-	 * flags set in this field. The supported feature mask is available
-	 * in LMA_INCOMPAT_SUPP.
-	 */
-	uint32_t	lma_incompat;
-	/** FID of this inode */
-	struct lu_fid	lma_self_fid;
-	/** mdt/ost type, others */
-	uint64_t	lma_flags;
-};
+static inline ssize_t sys_lov_user_md_size(const struct lov_user_md *lum)
+{
+	if (!(lum->lmm_magic == LOV_USER_MAGIC_V1 ||
+	      lum->lmm_magic == LOV_USER_MAGIC_V3)) {
+		errno = EINVAL;
+		return -1;
+	}
+
+	return lov_user_md_size(lum->lmm_stripe_count, lum->lmm_magic);
+}
+
+static inline int fprint_lov_user_md(FILE *file,
+				     const struct lov_user_md *lum, 
+				     size_t lum_size)
+{
+	int rc, print_count = 0;
+
+	if (lum_size < sizeof(*lum)) {
+		errno = EINVAL;
+		rc = -1;
+		goto out;
+	}
+
+	rc = fprintf(file,
+		     "lmm_magic         %12"PRIx32"\n"
+		     "lmm_pattern       %12x\n"
+		     "lmm_released      %12d\n"
+		     "lmm_oi_id         %12"PRIx64"\n"
+		     "lmm_oi_seq        %12"PRIx64"\n"
+		     "lmm_stripe_size   %12x\n"
+		     "lmm_stripe_count  %12x\n"
+		     "lmm_layout_gen    %12x\n",
+		     (uint32_t) lum->lmm_magic,
+		     lov_pattern(lum->lmm_pattern),
+		     (lum->lmm_pattern & LOV_PATTERN_F_RELEASED) != 0,
+		     (uint64_t) lmm_oi_id((struct ost_id *)&lum->lmm_oi),
+		     (uint64_t) lmm_oi_seq((struct ost_id *)&lum->lmm_oi),
+		     lum->lmm_stripe_size,
+		     (unsigned) lum->lmm_stripe_count,
+		     (unsigned) lum->lmm_layout_gen);
+	if (rc < 0)
+		goto out;
+	print_count += rc;
+
+	rc = fprintf(file, "%12s %12s %8s %8s\n",
+		     "object_id", "object_seq", "ost_gen", "ost_idx");
+	if (rc < 0)
+		goto out;
+	print_count += rc;
+
+	const struct lov_user_ost_data_v1 *objs;
+
+	if (lum->lmm_magic == LOV_USER_MAGIC_V1) {
+		objs = &((const struct lov_user_md_v1 *) lum)->lmm_objects[0];
+	} else if (lum->lmm_magic == LOV_USER_MAGIC_V3) {
+		objs = &((const struct lov_user_md_v3 *) lum)->lmm_objects[0];
+	} else {
+		errno = EINVAL;
+		rc = -1;
+		goto out;
+	}
+
+	/* TODO Print pool. */
+
+	size_t objs_size = lum_size - ((const char *)objs - (const char *)lum);
+	size_t obj_count = objs_size / sizeof(objs[0]);
+
+	if (lum->lmm_stripe_count < obj_count)
+		obj_count = lum->lmm_stripe_count;
+
+	int i;
+	for (i = 0; i < obj_count; i++) {
+		const struct lov_user_ost_data_v1 *o = &objs[i];
+
+		rc = fprintf(file, "%12"PRIx64" %12"PRIx64" %8x %8x\n",
+			     (uint64_t) lmm_oi_id((struct ost_id *)&o->l_ost_oi),
+			     (uint64_t) lmm_oi_seq((struct ost_id *)&o->l_ost_oi),
+			     (unsigned) o->l_ost_gen,
+			     (unsigned) o->l_ost_idx);
+		if (rc < 0)
+			goto out;
+		print_count += rc;
+	}
+
+	rc = print_count;
+out:
+	return rc;
+}
 
 #endif

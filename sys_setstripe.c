@@ -8,7 +8,7 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include <errno.h>
-#include "lustre/lustre_user.h"
+#include "sys_lustre.h"
 #include "trace.h"
 
 const char *program_usage = "[OPTION]... PATH";
@@ -17,7 +17,7 @@ int main(int argc, char *argv[])
 {
 	const char *path = NULL;
 	int fd = -1;
-	struct lov_user_md_v3 *lum = NULL;
+	struct lov_user_md *lum = NULL;
 	size_t stripe_count = 2;
 	size_t lum_size;
 	int want_quiet = 0;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 	if (fd < 0)
 		FATAL("cannot open '%s': %m\n", path);
 
-	lum_size = offsetof(typeof(*lum), lmm_objects[stripe_count + 1]);
+	lum_size = lov_user_md_size(stripe_count, LOV_USER_MAGIC_V3);
 	lum = malloc(lum_size);
 	if (lum == NULL)
 		FATAL("cannot allocate stripe info: %m\n");
@@ -79,6 +79,9 @@ int main(int argc, char *argv[])
 	if (want_quiet)
 		goto out;
 
+	fprint_lov_user_md(stdout, (struct lov_user_md *)lum, sys_lov_user_md_size(lum));
+
+#if 0
 	printf("lmm_magic         %12x\n"
 	       "lmm_pattern       %12x\n"
 	       "lmm_object_id     %12lx\n"
@@ -93,6 +96,7 @@ int main(int argc, char *argv[])
 	       lum->lmm_stripe_size,
 	       (unsigned) lum->lmm_stripe_count,
 	       (unsigned) lum->lmm_stripe_offset);
+#endif
 
 out:
 	if (close(fd) < 0)

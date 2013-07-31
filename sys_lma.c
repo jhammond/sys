@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
 
 	lma = (struct lustre_mdt_attrs *) val_buf;
 
-#define X(w,m)						\
+#define X(w, m)						\
 	printf("%-20s %24"PRIx##w"\n", #m, lma->m)
 
 	X(32, lma_compat);
@@ -106,12 +106,6 @@ int main(int argc, char *argv[])
 	snprintf(self_fid_buf, sizeof(self_fid_buf),
 		 PRI_FID, PRI_FID_ARGS(&lma->lma_self_fid));
 	printf("%-20s %24s\n", "lma_self_fid", self_fid_buf);
-#if 0
-	X(64, lma_self_fid.f_seq);
-	X(32, lma_self_fid.f_oid);
-	X(32, lma_self_fid.f_ver);
-#endif
-	X(64, lma_flags);
 #undef X
 
 	free(val_buf);
