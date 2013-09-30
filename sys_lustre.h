@@ -88,8 +88,8 @@ static inline int fprint_lov_user_md(FILE *file,
 		goto out;
 	print_count += rc;
 
-	rc = fprintf(file, "%12s %12s %8s %8s\n",
-		     "object_id", "object_seq", "ost_gen", "ost_idx");
+	rc = fprintf(file, "%12s %12s %8s %8s %s\n",
+		     "object_id", "object_seq", "ost_gen", "ost_idx", "FID");
 	if (rc < 0)
 		goto out;
 	print_count += rc;
@@ -117,12 +117,16 @@ static inline int fprint_lov_user_md(FILE *file,
 	int i;
 	for (i = 0; i < obj_count; i++) {
 		const struct lov_user_ost_data_v1 *o = &objs[i];
+		struct lu_fid fid;
 
-		rc = fprintf(file, "%12"PRIx64" %12"PRIx64" %8x %8x\n",
-			     (uint64_t) lmm_oi_id((struct ost_id *)&o->l_ost_oi),
-			     (uint64_t) lmm_oi_seq((struct ost_id *)&o->l_ost_oi),
-			     (unsigned) o->l_ost_gen,
-			     (unsigned) o->l_ost_idx);
+		ostid_to_fid(&fid, (struct ost_id *)&o->l_ost_oi, o->l_ost_idx);
+
+		rc = fprintf(file, "%12"PRIx64" %12"PRIx64" %8x %8x "DFID"\n",
+			     (uint64_t)lmm_oi_id((struct ost_id *)&o->l_ost_oi),
+			     (uint64_t)lmm_oi_seq((struct ost_id *)&o->l_ost_oi),
+			     (unsigned)o->l_ost_gen,
+			     (unsigned)o->l_ost_idx,
+			     PFID(&fid));
 		if (rc < 0)
 			goto out;
 		print_count += rc;

@@ -5,7 +5,7 @@ CPPFLAGS += -D_GNU_SOURCE \
             -I${LUSTRE_RELEASE}/lnet/include \
             -I${LUSTRE_RELEASE}/lustre/include
 
-CFLAGS += -Wall -Werror
+CFLAGS += -Wall -Werror -g
 
 SYS_CMDS = \
   sys_2523 \
@@ -24,6 +24,7 @@ SYS_CMDS = \
   sys_getstripe \
   sys_getstripe_ea \
   sys_getstripe_path \
+  sys_hsm \
   sys_hsm_request \
   sys_lea \
   sys_link \
