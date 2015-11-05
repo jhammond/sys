@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
 
 	int rc = ioctl(fd, LL_IOC_LOV_GETSTRIPE, lum);
 	if (rc < 0)
-		FATAL("cannot get stripe info for `%s': %m\n", path);
+		FATAL("cannot get stripe info for '%s': %m\n", path);
 
 	if (lum->lmm_magic != LOV_USER_MAGIC_V1 &&
 	    lum->lmm_magic != LOV_USER_MAGIC_V3)

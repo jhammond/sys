@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   new_path = argv[2];
 
   if (rename(old_path, new_path) < 0) {
-    fprintf(stderr, "cannot rename `%s' to `%s': %m\n", old_path, new_path);
+    fprintf(stderr, "cannot rename '%s' to '%s': %m\n", old_path, new_path);
     exit(EXIT_FAILURE);
   }
 

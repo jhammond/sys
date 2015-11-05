@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
       usage(stdout, EXIT_SUCCESS);
       break;
     case '?':
-      fprintf(stderr, "Try `%s --help' for more information\n",
+      fprintf(stderr, "Try '%s --help' for more information\n",
 	      program_invocation_short_name);
       exit(EXIT_FAILURE);
     }
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   gid = strtol(argv[optind + 2], NULL, 0);
 
   if (chown(path, uid, gid) < 0)
-    FATAL("cannot change owner of `%s' to uid %d, gid %d: %m\n",
+    FATAL("cannot change owner of '%s' to uid %d, gid %d: %m\n",
 	  path, uid, gid);
 
   return 0;

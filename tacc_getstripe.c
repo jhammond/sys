@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   const char *path = argv[1];
   int fd = open(path, O_RDONLY);
   if (fd < 0)
-    FATAL("cannot open `%s': %m\n", path);
+    FATAL("cannot open '%s': %m\n", path);
 
   size_t stripe_count_max = 1024;
   struct lov_user_md_v1 *lum;
@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
   int rc = ioctl(fd, LL_IOC_LOV_GETSTRIPE, lum);
   if (rc < 0)
-    FATAL("cannot get stripe info for `%s': %m\n", path);
+    FATAL("cannot get stripe info for '%s': %m\n", path);
 
   printf("lmm_magic         %8x\n"
          "lmm_pattern       %8x\n"

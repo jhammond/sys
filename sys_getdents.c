@@ -83,14 +83,14 @@ int main(int argc, char *argv[])
 
   int dfd = open(path, O_RDONLY|O_DIRECTORY);
   if (dfd < 0)
-    FATAL("cannot open `%s': %s\n", path, strerror(errno));
+    FATAL("cannot open '%s': %s\n", path, strerror(errno));
 
   while (1) {
     char buf[4096];
     ssize_t nr = syscall(SYS_getdents64, dfd, buf, sizeof(buf));
 
     if (nr < 0)
-      FATAL("cannot read directory `%s': %s\n", path, strerror(errno));
+      FATAL("cannot read directory '%s': %s\n", path, strerror(errno));
 
     if (nr == 0)
       break;
@@ -128,9 +128,9 @@ int main(int argc, char *argv[])
 		 d->d_off, (unsigned short) d->d_reclen, d->d_name);
       } else {
 	if (show_hex)
-	  printf("%c %16"PRIx64" `%s'\n", c, d->d_ino, d->d_name);
+	  printf("%c %16"PRIx64" '%s'\n", c, d->d_ino, d->d_name);
 	else
-	  printf("%c %16"PRIu64" `%s'\n", c, d->d_ino, d->d_name);
+	  printf("%c %16"PRIu64" '%s'\n", c, d->d_ino, d->d_name);
       }
 
       p += d->d_reclen;

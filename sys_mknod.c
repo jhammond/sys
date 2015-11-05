@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 			mode = strtol(optarg, NULL, 0);
 			break;
 		case '?':
-			fprintf(stderr, "Try `%s --help' for more information\n",
+			fprintf(stderr, "Try '%s --help' for more information\n",
 				program_invocation_short_name);
 			exit(EXIT_FAILURE);
 		}
@@ -80,12 +80,12 @@ have_args:
 		mode |= S_IFSOCK;
 		break;
 	default:
-		fprintf(stderr, "invalid type `%s'\n", type);
+		fprintf(stderr, "invalid type '%s'\n", type);
 		exit(EXIT_FAILURE);
 	}
 
 	if (mknod(path, mode, makedev(maj, min)) < 0) {
-		fprintf(stderr, "cannot create node `%s' mode %o, maj %d, min %d: %m\n",
+		fprintf(stderr, "cannot create node '%s' mode %o, maj %d, min %d: %m\n",
 			path, mode, maj, min);
 		exit(EXIT_FAILURE);
 	}

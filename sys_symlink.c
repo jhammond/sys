@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   new_path = argv[2];
 
   if (symlink(old_path, new_path) < 0) {
-    fprintf(stderr, "cannot create symbolic link `%s' containing `%s': %m\n",
+    fprintf(stderr, "cannot create symbolic link '%s' containing '%s': %m\n",
 	    new_path, old_path);
     exit(EXIT_FAILURE);
   }

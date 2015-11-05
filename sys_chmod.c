@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
       usage(stdout, EXIT_SUCCESS);
       break;
     case '?':
-      fprintf(stderr, "Try `%s --help' for more information\n",
+      fprintf(stderr, "Try '%s --help' for more information\n",
 	      program_invocation_short_name);
       exit(EXIT_FAILURE);
     }
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
   mode = strtol(argv[optind + 1], NULL, 0);
 
   if (chmod(path, mode) < 0)
-    FATAL("cannot change mode of `%s' to %05o: %m\n", path, mode);
+    FATAL("cannot change mode of '%s' to %05o: %m\n", path, mode);
 
   return 0;
 }

@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   path = argv[1];
 
   if (unlink(path) < 0) {
-    fprintf(stderr, "cannot unlink `%s': %m\n", path);
+    fprintf(stderr, "cannot unlink '%s': %m\n", path);
     exit(EXIT_FAILURE);
   }
 

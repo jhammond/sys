@@ -16,7 +16,7 @@ static inline void usage(FILE *file, int status)
 
 static inline void bad_option(void)
 {
-  fprintf(stderr, "Try `%s --help' for more information\n",
+  fprintf(stderr, "Try '%s --help' for more information\n",
 	  program_invocation_short_name);
   exit(EXIT_FAILURE);
 }

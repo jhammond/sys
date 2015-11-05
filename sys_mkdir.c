@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
       delay = strtoul(optarg, NULL, 0);
       break;
     case '?':
-      fprintf(stderr, "Try `%s --help' for more information\n",
+      fprintf(stderr, "Try '%s --help' for more information\n",
 	      program_invocation_short_name);
       exit(EXIT_FAILURE);
     }
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
   path = argv[optind];
 
   if (mkdirat(at_fd, path, mode) < 0)
-    FATAL("cannot mkdir `%s' with mode %04o: %m\n", path, mode);
+    FATAL("cannot mkdir '%s' with mode %04o: %m\n", path, mode);
 
   if (want_pause)
     pause();

@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
 
   ssize_t len = readlink(path, buf, sizeof(buf));
   if (len < 0)
-    FATAL("cannot read link `%s': %m\n", path);
+    FATAL("cannot read link '%s': %m\n", path);
 
-  printf("`%s' `%.*s'\n", path, (int) len, buf);
+  printf("'%s' '%.*s'\n", path, (int) len, buf);
 
   return 0;
 }

@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
       delay = strtoul(optarg, NULL, 0);
       break;
     case '?':
-      fprintf(stderr, "Try `%s --help' for more information\n",
+      fprintf(stderr, "Try '%s --help' for more information\n",
 	      program_invocation_short_name);
       exit(EXIT_FAILURE);
     }
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
   path = argv[optind];
 
   if (creat(path, mode) < 0)
-    FATAL("cannot create `%s' with mode %04o: %m\n", path, mode);
+    FATAL("cannot create '%s' with mode %04o: %m\n", path, mode);
 
   if (want_pause)
     pause();

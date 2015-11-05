@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     /* ... */;
 
   if (truncate(path, len) < 0) {
-    fprintf(stderr, "cannot truncate `%s' to length %lld: %m\n",
+    fprintf(stderr, "cannot truncate '%s' to length %lld: %m\n",
 	    path, len);
     exit(EXIT_FAILURE);
   }

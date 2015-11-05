@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
   new_path = argv[2];
 
   if (link(old_path, new_path) < 0)
-    FATAL("cannot link `%s' to `%s': %m\n", new_path, old_path);
+    FATAL("cannot link '%s' to '%s': %m\n", new_path, old_path);
 
   return 0;
 }

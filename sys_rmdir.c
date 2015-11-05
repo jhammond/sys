@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
   path = argv[1];
 
   if (rmdir(path) < 0) {
-    fprintf(stderr, "cannot delete directory `%s': %m\n", path);
+    fprintf(stderr, "cannot delete directory '%s': %m\n", path);
     exit(EXIT_FAILURE);
   }
 

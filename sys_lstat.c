@@ -18,7 +18,7 @@ int sys_stat(const char *path)
   struct stat st;
 
   if (lstat(path, &st) < 0) {
-    fprintf(stderr, "cannot stat `%s': %s\n", path, strerror(errno));
+    fprintf(stderr, "cannot stat '%s': %s\n", path, strerror(errno));
     return -1;
   }
 

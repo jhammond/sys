@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
       delay = strtoul(optarg, NULL, 0);
       break;
     case '?':
-      fprintf(stderr, "Try `%s --help' for more information\n",
+      fprintf(stderr, "Try '%s --help' for more information\n",
 	      program_invocation_short_name);
       exit(EXIT_FAILURE);
     }
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     flags |= O_WRONLY;
 
   if (open(path, flags, mode) < 0) {
-    fprintf(stderr, "cannot open `%s' with flags %d, mode %04o: %m\n",
+    fprintf(stderr, "cannot open '%s' with flags %d, mode %04o: %m\n",
 	    path, flags, mode);
     exit(EXIT_FAILURE);
   }

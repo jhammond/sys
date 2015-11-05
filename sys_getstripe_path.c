@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
 	rc = ioctl(fd, LL_IOC_MDC_GETINFO, argv[2]);
 	if (rc < 0)
-		FATAL("cannot get stripe info for `%s': %m\n", path);
+		FATAL("cannot get stripe info for '%s': %m\n", path);
 
 	close(fd);
 

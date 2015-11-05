@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
       delay = strtoul(optarg, NULL, 0);
       break;
     case '?':
-      fprintf(stderr, "Try `%s --help' for more information\n",
+      fprintf(stderr, "Try '%s --help' for more information\n",
 	      program_invocation_short_name);
       exit(EXIT_FAILURE);
     }
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
   path = argv[optind];
 
   if (chdir(path) < 0)
-    FATAL("cannot chdir to `%s': %m\n", path);
+    FATAL("cannot chdir to '%s': %m\n", path);
 
   if (want_pause)
     pause();
