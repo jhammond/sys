@@ -19,6 +19,7 @@ SYS_CMDS = \
   sys_creat \
   sys_delay_setxattr \
   sys_delay_truncate \
+  sys_fexecve \
   sys_getdents \
   sys_getdents_race \
   sys_getstripe \
