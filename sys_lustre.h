@@ -22,6 +22,12 @@
 	((uint32_t) (f)->f_ver)
 #define PRI_FID_LEN (10 + 2 * (sizeof(uint64_t) + 2 * sizeof(uint32_t)))
 
+#define SCN_FID "[%"SCNx64":%"SCNx32":%"SCNx32"]"
+#define SCN_FID_ARGS(fid)			\
+	((uint64_t *)&((fid)->f_seq)),		\
+	((uint32_t *)&((fid)->f_oid)),		\
+	((uint32_t *)&((fid)->f_ver))
+
 /* The link ea holds 1 \a link_ea_entry for each hardlink */
 #define LINK_EA_MAGIC 0x11EAF1DFUL
 
